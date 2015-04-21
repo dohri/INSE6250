@@ -1,0 +1,201 @@
+MODULE main
+VAR
+state: {s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11};
+
+page-HomePage:boolean;
+page-LoginPage: boolean;
+page-LoginCheck: boolean;
+page-News: boolean;
+page-LoginFail: boolean;
+page-StudentView: boolean;
+page-Grade: boolean;
+page-GetGrade: boolean;
+page-GradeList: boolean;
+page-StudentInfo: boolean;
+page-GetStudent: boolean;
+page-Exit: boolean;
+link-News: boolean;
+link-LoginPage: boolean;
+link-Grade: boolean;
+call-LoginCheck: boolean;
+call-GetStudent: boolean;
+call-GetGrade: boolean;
+build-StudentView: boolean;
+build-LoginFail: boolean;
+build-GradeList: boolean;
+build-StudentInfo: boolean;
+
+
+ASSIGN
+init(state):= s0;
+init(page-HomePage):=TRUE;
+init(page-LoginPage):=FALSE;
+init(page-LoginCheck):=FALSE;
+init(page-News):=FALSE;
+init(page-LoginFail):=FALSE;
+init(page-StudentView):=FALSE;
+init(page-Grade):=FALSE;
+init(page-GetGrade):=FALSE;
+init(page-GradeList):=FALSE;
+init(page-StudentInfo):=FALSE;
+init(page-GetStudent):=FALSE;
+init(page-Exit):=FALSE;
+init(link-News):=TRUE;
+init(link-LoginPage):=TRUE;
+init(link-Grade):=FALSE;
+init(call-LoginCheck):=FALSE;
+init(call-GetStudent):=FALSE;
+init(call-GetGrade):=FALSE;
+init(build-StudentView):=FALSE;
+init(build-LoginFail):=FALSE;
+init(build-GradeList):=FALSE;
+init(build-StudentInfo):=FALSE;
+
+next(state):=case
+             state=s0: {s1,s2};
+			 state=s1: s11;
+			 state=s2: s3;
+			 state=s3: {s4,s5};
+			 state=s4: {s6,s9};
+			 state=s5: s2;
+			 state=s6: s7;
+			 state=s7: s8;
+			 state=s8: s11;
+			 state=s9: s10;
+			 state=s10: s6;
+			 state=s11: s11;
+			 TRUE: state;
+esac;
+
+next(page-HomePage):=case
+             next(state)=s0: TRUE;
+             TRUE:FALSE;
+esac;
+next(page-News):=case
+             next(state)=s1: TRUE;
+             TRUE:FALSE;
+esac;
+next(page-LoginPage):=case
+             next(state)=s2: TRUE;
+             TRUE:FALSE;
+esac;
+next(page-LoginCheck):=case
+             next(state)= s3:TRUE;
+			 TRUE:FALSE;
+esac;
+
+next(page-LoginFail):=case
+             next(state)=s5:TRUE;
+			 TRUE:FALSE;
+esac;
+next(page-StudentView):=case
+             next(state)=s4:TRUE;
+			 TRUE:FALSE;
+esac;
+next(page-Grade):=case
+             next(state)=s6:TRUE;
+			 TRUE:FALSE;
+esac;
+next(page-GetGrade):=case
+             next(state)=s7:TRUE;
+			 TRUE:FALSE;
+esac;
+next(page-GradeList):=case
+             next(state)=s8:TRUE;
+			 TRUE:FALSE;
+esac;
+next(page-StudentInfo):=case
+             next(state)=s10:TRUE;
+			 TRUE:FALSE;
+esac;
+next(page-GetStudent):=case
+             next(state)=s9:TRUE;
+			 TRUE:FALSE;
+esac;
+next(page-Exit):=case
+             next(state)=s11:TRUE;
+			 TRUE:FALSE;
+esac;
+next(link-News):=case
+             next(state)=s0: TRUE;
+             TRUE: FALSE;
+esac;
+next(link-LoginPage):=case
+             next(state)=s0: TRUE;
+             TRUE: FALSE;
+esac;
+next(link-Grade):=case
+             next(state)=s4|next(state)=s10: TRUE;
+             TRUE: FALSE;
+esac;
+next(call-LoginCheck):=case
+             next(state)=s2: TRUE;
+             TRUE: FALSE;
+esac;
+next(call-GetStudent):=case
+             next(state)=s4: TRUE;
+             TRUE: FALSE;
+esac;
+next(call-GetGrade):=case
+             next(state)=s6: TRUE;
+             TRUE: FALSE;
+esac;
+next(build-StudentView):=case
+             next(state)=s3: TRUE;
+             TRUE: FALSE;
+esac;
+next(build-LoginFail):=case
+             next(state)=s3: TRUE;
+             TRUE: FALSE;
+esac;
+next(build-GradeList):=case
+             next(state)=s7: TRUE;
+             TRUE: FALSE;
+esac;
+next(build-StudentInfo):=case
+             next(state)=s9: TRUE;
+             TRUE: FALSE;
+esac;
+
+
+-----------Reachability properties----------------
+AG (page-HomePage -> AX page-LoginPage);
+EF page-News;
+EF page-LoginPage;
+EF page-LoginPage;
+AG (page-LoginCheck -> AX page-StudentView);
+AG (page-StudentView -> AX page-Grade);
+EF page-Grade;
+EF page-GetGrade;
+EF page-GradeList;
+EF page-GetStudent;
+EF page-StudentInfo;
+ 
+----------Liveness properties----------------
+
+AG EF(page-HomePage -> (link-News & EX page-News));
+AG EF(page-HomePage -> (link-LoginPage & EX page-LoginPage));
+AG EF(page-LoginPage ->(call-LoginCheck & EX page-LoginCheck));
+AG EF(build-StudentView -> EX page-StudentView);
+AG EF(build-LoginFail -> EX page-LoginFail);
+AG EF(page-StudentView -> (link-Grade & EX page-Grade));
+AG EF(page-StudentView ->(call-GetStudent & EX page-GetStudent));
+AG EF(page-Grade ->(call-GetGrade & EX page-GetGrade));
+AG EF(build-StudentInfo -> EX page-StudentInfo);
+AG EF(page-StudentInfo ->(link-Grade & EX page-Grade));
+AG EF(build-GradeList -> EX page-GradeList);
+AG(page-StudentInfo -> (link-Grade & EX page-GradeList));
+AG(page-StudentView -> (link-Grade & EX page-GradeList));
+ 
+ 
+-----------safety properties----------------
+AG EF(page-HomePage -> !EX(link-News | link-LoginPage))
+AG EF(page-LoginPage -> !EX(call-LoginCheck))
+AG EF(page-LoginCheck -> !EX(build-StudentView | build-LoginFail))
+AG EF(page-StudentView -> !EX(link-Grade | call-GetStudent))
+AG EF(page-GetStudent -> !EX(build-StudentInfo))
+AG EF(page-StudentInfo -> !EX(link-Grade))
+AG EF(page-Grade -> !EX(call-GetGrade))
+AG EF(page-GetGrade -> !EX(build-GradeList))
+SPEC AG(page-LoginFail -> EX page-Exit)
+
